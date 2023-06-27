@@ -1,0 +1,67 @@
+!pip install dash --upgrade
+!pip install werkzeug --upgrade
+pip install dash plotly
+
+# Load the dataset
+data = pd.read_csv("1000 set Healthcare Providers.csv")
+
+# Data preprocessing
+x = np.array(data["Number of Distinct Medicare Beneficiary/Per Day Services"]).reshape(-1, 1)
+y = np.array(data["Average Medicare Standardized Amount"])
+
+# Splitting dataset
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+# Model building
+dataT = LinearRegression()
+dataT.fit(x_train, y_train)
+dataT_y_train = dataT.predict(x_train)
+dataT_y_test = dataT.predict(x_test)
+
+# Evaluation metrics
+dataT_train_mse = mean_squared_error(y_train, dataT_y_train)
+dataT_train_r2 = r2_score(y_train, dataT_y_train)
+dataT_test_mse = mean_squared_error(y_test, dataT_y_test)
+dataT_test_r2 = r2_score(y_test, dataT_y_test)
+
+# Create the dashboard
+plt.figure(figsize=(12, 8))
+
+# Scatter plot of actual vs. predicted values for training data
+plt.subplot(2, 2, 1)
+plt.scatter(y_train, dataT_y_train)
+plt.plot(y_train, y_train, color='r', linestyle='--')
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Training Data')
+
+# Scatter plot of actual vs. predicted values for testing data
+plt.subplot(2, 2, 2)
+plt.scatter(y_test, dataT_y_test)
+plt.plot(y_test, y_test, color='r', linestyle='--')
+plt.xlabel('Actual')
+plt.ylabel('Predicted')
+plt.title('Testing Data')
+
+# Bar plot of training and testing MSE
+plt.subplot(2, 2, 3)
+mse_values = [dataT_train_mse, dataT_test_mse]
+labels = ['Training MSE', 'Testing MSE']
+sns.barplot(x=labels, y=mse_values)
+plt.ylabel('MSE')
+plt.title('Mean Squared Error')
+
+# Bar plot of training and testing R-squared
+plt.subplot(2, 2, 4)
+r2_values = [dataT_train_r2, dataT_test_r2]
+labels = ['Training R2', 'Testing R2']
+sns.barplot(x=labels, y=r2_values)
+plt.ylabel('R2')
+plt.title('R-squared')
+
+# Adjust spacing between subplots
+plt.tight_layout()
+
+# Show the dashboard
+plt.show()
+
