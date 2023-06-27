@@ -1,0 +1,38 @@
+!pip install dash --upgrade
+!pip install werkzeug --upgrade
+pip install dash plotly
+
+import numpy as np
+import pandas as pd
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = pd.read_csv('1000 set Healthcare Providers.csv')  # Replace 'your_dataset.csv' with your actual dataset file
+
+# Select the features you want to use for anomaly detection
+features = ['Number of Services', 'Number of Medicare Beneficiaries']
+
+# Preprocessing: scale the features to have zero mean and unit variance
+scaled_data = (data[features] - data[features].mean()) / data[features].std()
+
+# Choose the number of nearest neighbors for anomaly detection
+k = 5
+
+# Train the KNN model
+knn_model = NearestNeighbors(n_neighbors=k)
+knn_model.fit(scaled_data)
+
+# Compute the distance to the kth nearest neighbor for each data point
+distances, _ = knn_model.kneighbors(scaled_data)
+
+# Compute the anomaly score as the maximum distance to the kth nearest neighbor
+anomaly_scores = np.max(distances, axis=1)
+
+# Plotting the anomaly scores
+plt.figure(figsize=(10, 6))
+plt.plot(anomaly_scores)
+plt.xlabel('Data Point')
+plt.ylabel('Anomaly Score')
+plt.title('Anomaly Detection using KNN between Number of Services and Number of Medicare Beneficiaries')
+plt.show()
