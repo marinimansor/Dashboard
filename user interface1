@@ -1,0 +1,42 @@
+pip install dash plotly
+!pip install dash --upgrade
+!pip install werkzeug --upgrade
+import pandas as pd
+import plotly.express as px
+import dash
+from dash import dcc
+from dash import html
+
+# Read the data
+data = pd.read_csv("1000 set Healthcare Providers.csv", encoding='latin-1')
+
+# Create the app
+app = dash.Dash(__name__)
+
+# Define the layout
+app.layout = html.Div(children=[
+    html.H1('Healthcare Providers Dashboard', style={'textAlign': 'center'}),
+    html.Div(children='''
+        A dashboard to explore healthcare providers data.
+    ''', style={'textAlign': 'center'}),
+    dcc.Graph(
+        id='average-reimbursement',
+        figure=px.histogram(data, x='Average Medicare Standardized Amount', title='Average Reimbursement')
+    ),
+    dcc.Graph(
+        id='beneficiary-services',
+        figure=px.histogram(data, x='Number of Distinct Medicare Beneficiary/Per Day Services', title='Beneficiary Services')
+    ),
+    dcc.Graph(
+        id='provider-type',
+        figure=px.histogram(data, x='Provider Type', title='Provider Type')
+    ),
+    dcc.Graph(
+        id='state',
+        figure=px.histogram(data, x='State Code of the Provider', title='State')
+    )
+])
+
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=False)
