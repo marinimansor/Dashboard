@@ -1,0 +1,45 @@
+import numpy as np
+import pandas as pd
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+# Load the dataset
+data = pd.read_csv('1000 set Healthcare Providers.csv')
+
+# Select the features you want to use for anomaly detection
+features = ['Number of Services', 'Number of Medicare Beneficiaries']
+
+# Preprocessing: scale the features to have zero mean and unit variance
+scaled_data = (data[features] - data[features].mean()) / data[features].std()
+
+# Choose the number of nearest neighbors for anomaly detection
+k = 5
+
+# Train the KNN model
+knn_model = NearestNeighbors(n_neighbors=k)
+knn_model.fit(scaled_data)
+
+# Compute the distance to the kth nearest neighbor for each data point
+distances, _ = knn_model.kneighbors(scaled_data)
+
+# Compute the anomaly score as the maximum distance to the kth nearest neighbor
+anomaly_scores = np.max(distances, axis=1)
+
+# Set the threshold to classify data points as anomalous or normal
+threshold = 0.5  # Adjust the threshold according to your requirements
+
+# Classify data points as anomalous or normal based on the threshold
+predictions = anomaly_scores > threshold
+
+# Ground truth labels (assuming all data points are labeled as anomalous)
+ground_truth = np.ones(len(data), dtype=int)
+
+# Compute precision, recall, and F1-score
+precision = precision_score(ground_truth, predictions)
+recall = recall_score(ground_truth, predictions)
+f1 = f1_score(ground_truth, predictions)
+
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1-score:", f1)
